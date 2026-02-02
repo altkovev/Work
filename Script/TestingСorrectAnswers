@@ -1,0 +1,48 @@
+// Заменить вопросы
+form.onChange(['1 + 3 = 4?', '3 + 3 = 8?', 'Нажми "Нет"'], true)
+  .setValue('Результат', state => {
+    const answers = state.changes;
+    
+    // Правильные ответы для каждого вопроса
+    const correctAnswers = {
+      '1 + 3 = 4?': "Да",
+      '3 + 3 = 8?': "Нет", 
+      'Нажми "Нет"': "Нет"  // Изменили правильный ответ
+    };
+    
+    // Названия полей (должны совпадать с массивом в onChange)
+    const fieldNames = ['1 + 3 = 4?', '3 + 3 = 8?', 'Нажми "Нет"'];
+    
+    // Проверяем, заполнены ли все вопросы
+    const allQuestionsAnswered = answers.every(answer => answer?.choice_name);
+    
+    if (!allQuestionsAnswered) {
+      return "";
+    }
+    
+    // Подсчет правильных ответов
+    let correctCount = 0;
+    const errors = [];
+    
+    fieldNames.forEach((fieldName, index) => {
+      const answer = answers[index];
+      const correctAnswer = correctAnswers[fieldName];
+      
+      if (answer.choice_name === correctAnswer) {
+        correctCount++;
+      } else {
+        errors.push(`Вопрос '${fieldName}' - неправильный ответ`);
+      }
+    });
+    
+    // Формируем результат
+    let resultText = `Результат: ${correctCount} из ${fieldNames.length} правильных ответов`;
+    
+    if (errors.length > 0) {
+      resultText += "\n\nОшибки:\n" + errors.join("\n");
+    } else if (correctCount === fieldNames.length) {
+      resultText += "\n\nВсе ответы верны! ✅";
+    }
+    
+    return resultText;
+  });
